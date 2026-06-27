@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Présence Sys — Administration</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #111;
+            color: #eee;
+            margin: 0
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a1a1a
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            text-align: left;
+            font-size: 14px
+        }
+
+        th {
+            background: #222
+        }
+
+        tr:hover {
+            background: #222
+        }
+
+        input, select, button {
+            font-family: inherit;
+            font-size: 14px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #222;
+            color: #eee
+        }
+
+        button {
+            cursor: pointer;
+            background: #5555ee;
+            border: none
+        }
+
+        button.ghost {
+            background: #333
+        }
+
+        button.danger {
+            background: #cc4444
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px
+        }
+
+        .badge.present {
+            background: #225522;
+            color: #9f9
+        }
+
+        .badge.absent {
+            background: #554422;
+            color: #fc9
+        }
+
+        #login {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111
+        }
+
+        #login .box {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            width: 300px
+        }
+
+        #login input {
+            width: 100%;
+            margin-bottom: 10px;
+            box-sizing: border-box
+        }
+
+        #app {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap
+        }
+
+        .toolbar input {
+            flex: 1
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap
+        }
+
+        .stat {
+            background: #1a1a1a;
+            padding: 12px 18px;
+            border-radius: 6px
+        }
+
+        .stat b {
+            font-size: 20px;
+            display: block
+        }
+
+        .error {
+            background: #552222;
+            color: #fbb;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: none
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: none;
+            align-items: center;
+            justify-content: center
+        }
+
+        .modal {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            width: 340px
+        }
+
+        .modal h3 {
+            margin-top: 0
+        }
+
+        .modal .form-group {
+            margin-bottom: 10px
+        }
+
+        .modal label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px
+        }
+
+        .modal input, .modal select {
+            width: 100%;
+            box-sizing: border-box
+        }
+
+        .modal .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 14px
+        }
+
+        #toasts {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .toast {
+            background: #222;
+            border-left: 3px solid #5555ee;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 13px
+        }
+
+        .toast.success {
+            border-color: #4a4
+        }
+
+        .toast.error {
+            border-color: #c44
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+    <div class="box">
+        <h2>Présence Sys</h2>
+        <div id="login-error" class="error"></div>
+        <input id="username" placeholder="Identifiant" autocomplete="username">
+        <input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <button id="login-btn" onclick="doLogin()" style="width:100%">Se connecter</button>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+    <header>
+        <h2>Présence Sys — Administration</h2>
+        <div>
+            <span id="header-username"></span>
+            <button class="ghost" onclick="doLogout()">Déconnexion</button>
+        </div>
+    </header>
+
+    <div class="stats">
+        <div class="stat"><b id="stat-total">—</b>Total</div>
+        <div class="stat"><b id="stat-present">—</b>Présents</div>
+        <div class="stat"><b id="stat-absent">—</b>Absences justifiées</div>
+        <div class="stat"><b id="stat-today">—</b>Aujourd'hui</div>
+    </div>
+
+    <div class="toolbar">
+        <input id="search-input" placeholder="Rechercher…" oninput="filterTable()">
+        <select id="status-filter" onchange="filterTable()">
+            <option value="">Tous les statuts</option>
+            <option value="present">Présent</option>
+            <option value="absent justifie">Absent justifié</option>
+        </select>
+        <button onclick="openCreateModal()">+</button>
+        <button class="ghost" onclick="loadAttendances()">Refresh</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Étudiant</th>
+            <th>ID Étudiant</th>
+            <th>Cours</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Arrivée</th>
+            <th>Justificatif</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="table-body">
+        <tr>
+            <td colspan="8">Chargement…</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- MODAL FORMULAIRE -->
+<div id="form-modal" class="overlay" onclick="closeOnOverlay(event,'form-modal')">
+    <div class="modal">
+        <h3 id="form-modal-title">Nouveau pointage</h3>
+        <div class="form-group">
+            <label>ID Étudiant</label>
+            <input id="f-student-id" maxlength="9">
+        </div>
+        <div class="form-group">
+            <label>ID Cours</label>
+            <input id="f-course-id" maxlength="9">
+        </div>
+        <div class="form-group">
+            <label>Statut</label>
+            <select id="f-status">
+                <option value="present">Présent</option>
+                <option value="absent justifie">Absent justifié</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Heure d'arrivée (optionnel)</label>
+            <input id="f-arrival" type="time" step="1">
+        </div>
+        <div class="form-group">
+            <label>Justificatif (optionnel)</label>
+            <input id="f-justif">
+        </div>
+        <div class="actions">
+            <button class="ghost" onclick="closeModal('form-modal')">Annuler</button>
+            <button id="form-submit-btn" onclick="submitForm()">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMATION SUPPRESSION -->
+<div id="confirm-modal" class="overlay" onclick="closeOnOverlay(event,'confirm-modal')">
+    <div class="modal">
+        <h3>Confirmer la suppression</h3>
+        <p>Supprimer le pointage de <b id="confirm-student-name"></b> ?<br>
+            <small style="color:#888">Action irréversible.</small></p>
+        <div class="actions">
+            <button class="ghost" onclick="closeModal('confirm-modal')">Annuler</button>
+            <button class="danger" id="confirm-delete-btn" onclick="confirmDelete()">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+    let authHeader = null;
+    let allRows = [];
+    let editMode = false;
+    let deleteTarget = null;
+    const API = 'http://localhost:8080/api/admin';
+
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    async function doLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+
+      if (!username || !password) {
+        errEl.textContent = 'Veuillez renseigner vos identifiants.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const header = 'Basic ' + btoa(username + ':' + password);
+      try {
+        const res = await fetch(`${API}/me`, { headers: { Authorization: header } });
+        if (res.ok) {
+          const user = await res.json();
+          authHeader = header;
+          document.getElementById('login').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          document.getElementById('header-username').textContent = user.username;
+          await loadAttendances();
+        } else if (res.status === 401) {
+          errEl.textContent = 'Identifiant ou mot de passe incorrect.';
+          errEl.style.display = 'block';
+        } else {
+          errEl.textContent = 'Erreur serveur (' + res.status + ').';
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = 'Impossible de joindre le serveur.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    function doLogout() {
+      authHeader = null;
+      allRows = [];
+      document.getElementById('login').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('password').value = '';
+    }
+
+    async function loadAttendances() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '<tr><td colspan="8">Chargement…</td></tr>';
+      try {
+        const res = await apiFetch(`${API}/attendances`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        allRows = await res.json();
+        updateStats();
+        renderTable(allRows);
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" style="color:#f88">Erreur de chargement.</td></tr>';
+        showToast('Erreur de chargement : ' + err.message, 'error');
+      }
+    }
+
+    function updateStats() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('stat-total').textContent = allRows.length;
+      document.getElementById('stat-present').textContent = allRows.filter(r => r.status === 'present').length;
+      document.getElementById('stat-absent').textContent = allRows.filter(r => r.status === 'absent justifie').length;
+      document.getElementById('stat-today').textContent = allRows.filter(r => r.courseDate === today).length;
+    }
+
+    function renderTable(rows) {
+      const tbody = document.getElementById('table-body');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8">Aucun pointage trouvé.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${esc(r.studentFullName)}</td>
+          <td>${esc(r.studentId)}</td>
+          <td>${esc(r.courseId)}</td>
+          <td>${esc(r.courseDate)}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td>${r.arrivalTime ? esc(r.arrivalTime) : '—'}</td>
+          <td>${r.justification ? esc(r.justification) : '—'}</td>
+          <td>
+            <button class="ghost" onclick='openEditModal(${JSON.stringify(r)})'>Edit</button>
+            <button class="danger" onclick='openDeleteModal(${JSON.stringify(r)})'>Suppr</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function statusBadge(status) {
+      return status === 'present'
+        ? '<span class="badge present">Présent</span>'
+        : '<span class="badge absent">Absent justifié</span>';
+    }
+
+    function filterTable() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+      const filtered = allRows.filter(r => {
+        const matchSearch = !q ||
+          r.studentFullName.toLowerCase().includes(q) ||
+          r.studentId.toLowerCase().includes(q) ||
+          r.courseId.toLowerCase().includes(q) ||
+          (r.courseDate && r.courseDate.includes(q));
+        const matchStatus = !status || r.status === status;
+        return matchSearch && matchStatus;
+      });
+      renderTable(filtered);
+    }
+
+    function openCreateModal() {
+      editMode = false;
+      document.getElementById('form-modal-title').textContent = 'Nouveau pointage';
+      document.getElementById('f-student-id').value = '';
+      document.getElementById('f-course-id').value = '';
+      document.getElementById('f-status').value = 'present';
+      document.getElementById('f-arrival').value = '';
+      document.getElementById('f-justif').value = '';
+      document.getElementById('f-student-id').readOnly = false;
+      document.getElementById('f-course-id').readOnly = false;
+      document.getElementById('form-modal').style.display = 'flex';
+    }
+
+    function openEditModal(row) {
+      editMode = true;
+      document.getElementById('form-modal-title').textContent = 'Modifier le pointage';
+      document.getElementById('f-student-id').value = row.studentId;
+      document.getElementById('f-course-id').value = row.courseId;
+      document.getElementById('f-status').value = row.status;
+      document.getElementById('f-arrival').value = row.arrivalTime ? row.arrivalTime.slice(0,8) : '';
+      document.getElementById('f-justif').value = row.justification || '';
+      document.getElementById('f-student-id').readOnly = true;
+      document.getElementById('f-course-id').readOnly = true;
+      document.getElementById('form-modal').style.display = 'flex';
+    }
+
+    function openDeleteModal(row) {
+      deleteTarget = { studentId: row.studentId, courseId: row.courseId };
+      document.getElementById('confirm-student-name').textContent = row.studentFullName + ' (cours ' + row.courseId + ')';
+      document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeOnOverlay(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+    async function submitForm() {
+      const studentId = document.getElementById('f-student-id').value.trim();
+      const courseId = document.getElementById('f-course-id').value.trim();
+      const status = document.getElementById('f-status').value;
+      const arrivalTime = document.getElementById('f-arrival').value || null;
+      const justif = document.getElementById('f-justif').value.trim() || null;
+
+      if (!studentId || !courseId) {
+        showToast("L'ID étudiant et l'ID cours sont obligatoires.", 'error');
+        return;
+      }
+
+      const body = { studentId, courseId, status, arrivalTime, justification: justif };
+      const method = editMode ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiFetch(`${API}/attendances`, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          closeModal('form-modal');
+          showToast(editMode ? 'Pointage mis à jour' : 'Pointage créé', 'success');
+          await loadAttendances();
+        } else {
+          const text = await res.text();
+          showToast('Erreur : ' + (text || res.status), 'error');
+        }
+      } catch (err) {
+        showToast('Erreur réseau : ' + err.message, 'error');
+      }
+    }
+
+    async function confirmDelete() {
+      if (!deleteTarget) return;
+      try {
+        const url = `${API}/attendances?studentId=${encodeURIComponent(deleteTarget.studentId)}&courseId=${encodeURIComponent(deleteTarget.courseId)}`;
+        const res = await apiFetch(url, { method: 'DELETE' });
+        if (res.ok) {
+          closeModal('confirm-modal');
+          showToast('Pointage supprimé.', 'success');
+          await loadAttendances();
+        } else {
+          const data = await res.json().catch(() => ({}));
+          showToast('Erreur : ' + (data.error || res.status), 'error');
+        }
+      } catch (err) {
+        showToast('Erreur réseau : ' + err.message, 'error');
+      } finally {
+        deleteTarget = null;
+      }
+    }
+
+    function apiFetch(url, opts = {}) {
+      opts.headers = opts.headers || {};
+      if (authHeader) opts.headers['Authorization'] = authHeader;
+      return fetch(url, opts);
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toasts');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+</script>
+</body>
+</html>

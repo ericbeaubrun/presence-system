@@ -176,23 +176,17 @@ VALUES ('2202100b', '2202100b', 'C0001');
 INSERT INTO appartenir_groupe
 VALUES ('2202100b', 'G0001');
 
-
--- Données Personnes & Enseignants (Marc Martin)
-
-
 INSERT INTO personnes
 VALUES ('E00000001', 'Martin', 'Marc', '1975-05-12', 'marc.martin@univ.fr', '0611223344', 'homme');
 
 INSERT INTO enseignants
 VALUES ('E00000001', 'D0001');
 
--- Données Cours
 INSERT INTO cours
 VALUES ('C00002', CURRENT_DATE, '08:00:00', '12:00:00', 'S0001');
 INSERT INTO enseigner
 VALUES ('E00000001', 'C00002');
 
--- Donnée de Présence Initiale (Déjà badgé)
 INSERT INTO assister
 VALUES ('2202100b', 'C00002', 'present', NULL, '09:00:00');
 
@@ -203,5 +197,5 @@ VALUES ('ADM000001', 'Admin', 'Système', NULL, 'admin@presence-sys.fr', NULL,
 INSERT INTO utilisateurs (id_user, identifiant, mot_de_passe, role)
 VALUES ('ADM000001',
         'admin',
-        '$2y$10$wAVr4xHgT.GYzTOqOn6BvOdHU/dN7j4zNCHNo3UmL6dEdHjCIdpDy',
+        'password_hash',
         'ADMIN') ON CONFLICT (id_user) DO NOTHING;
