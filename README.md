@@ -134,17 +134,7 @@ Expected responses include:
 
 # Installation
 
-## 1. Configure Environment Variables
-
-Create your local environment configuration file:
-
-```bash
-cp .env.example .env
-```
-
----
-
-## 2. Build the Project
+## 1. Build the Project
 
 Generate the executable JAR:
 
@@ -154,7 +144,7 @@ Generate the executable JAR:
 
 ---
 
-## 3. Start Docker Services
+## 2. Start Docker Services
 
 Build and launch the application stack:
 
@@ -169,7 +159,7 @@ Default services:
 
 ---
 
-## 4. Test the NFC Hardware Client
+## 3. Test the NFC Hardware Client
 
 Install the required Python packages:
 
@@ -185,7 +175,7 @@ python src/tests/nfc_reader_client_test.py
 
 ---
 
-## 5. Run the Web Administration Tests
+## 4. Run the Web Administration Tests
 
 Start a local HTTP server:
 
