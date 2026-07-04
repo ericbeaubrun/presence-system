@@ -7,12 +7,14 @@ from smartcard.util import toHexString
 SERVER_URL = "http://localhost:8080/api/v1/attendances"
 READER_ID = "L0001"
 
+
 def get_acr122u_reader():
     r = readers()
     for reader in r:
         if "ACR122" in str(reader):
             return reader
     return None
+
 
 def extract_uid(connection):
     GET_UID_APDU = [0xFF, 0xCA, 0x00, 0x00, 0x00]
@@ -25,6 +27,7 @@ def extract_uid(connection):
             hex_uid = hex_uid.zfill(8)
         return hex_uid
     return None
+
 
 def send_attendance(card_id):
     payload = {
@@ -39,6 +42,7 @@ def send_attendance(card_id):
         print(f"[{response.status_code}] {response.text}")
     except requests.exceptions.RequestException as e:
         print(f"[ERREUR] Connexion serveur impossible : {e}")
+
 
 def main():
     reader = get_acr122u_reader()
@@ -69,8 +73,9 @@ def main():
             import time
             time.sleep(0.5)
         except KeyboardInterrupt:
-            print("\nArrêt du client léger.")
+            print("\nArrêt du client.")
             break
+
 
 if __name__ == "__main__":
     main()
