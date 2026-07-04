@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Attendance Management and Verification System is a complete solution for managing student or employee attendance using NFC smart cards. The system combines a secure Spring Boot backend, a web-based administration interface, and a lightweight Python client connected to an ACR122U NFC reader.
+## Overview
+
+The Attendance Management and Verification System is a complete solution for managing student or employee attendance using NFC smart cards. This project was developed as part of the Database and Network course for the final year of the Computer Science Bachelor's degree at CY Cergy Paris Université. The system combines a secure Spring Boot backend, a web-based administration interface, and a lightweight Python client connected to an ACR122U NFC reader.
 
 ---
 
@@ -21,6 +23,19 @@ Its responsibilities include:
 * Preventing duplicate check-ins
 * Exposing secure REST APIs
 * Protecting administrative endpoints using **Spring Security** with **HTTP Basic Authentication**
+
+## Database Schema
+
+The database model is designed to efficiently manage the relationship between users, their assigned NFC cards, scheduled sessions, and attendance records.
+
+![Database Schema](https://github.com/user-attachments/assets/77ee136e-0f10-4b2b-a648-35ff21574795)
+
+Key entities include:
+* **Users**: Stores individual profile information.
+* **Cards**: Manages the mapping of unique NFC UIDs to specific users.
+* **Sessions**: Defines the schedule (time slots and locations) for attendance tracking.
+* **Attendances**: Records the actual check-in events, linking users, cards, and sessions to ensure verification and prevent duplicates.
+
 
 ### 2. Web Administration Interface
 
