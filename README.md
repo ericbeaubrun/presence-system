@@ -22,6 +22,19 @@ Its responsibilities include:
 * Exposing secure REST APIs
 * Protecting administrative endpoints using **Spring Security** with **HTTP Basic Authentication**
 
+## Database Schema
+
+The database model is designed to efficiently manage the relationship between users, their assigned NFC cards, scheduled sessions, and attendance records.
+
+![Database Schema](https://github.com/user-attachments/assets/77ee136e-0f10-4b2b-a648-35ff21574795)
+
+Key entities include:
+* **Users**: Stores individual profile information.
+* **Cards**: Manages the mapping of unique NFC UIDs to specific users.
+* **Sessions**: Defines the schedule (time slots and locations) for attendance tracking.
+* **Attendances**: Records the actual check-in events, linking users, cards, and sessions to ensure verification and prevent duplicates.
+
+
 ### 2. Web Administration Interface
 
 A web dashboard communicating asynchronously with the backend REST API.
