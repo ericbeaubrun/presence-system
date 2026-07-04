@@ -506,8 +506,6 @@ VALUES ('2202100b', 'C00029', 'present', NULL, '13:58:00'),
 
 
 -- Pour les tests Utilisateur = admin Mot de passe = admin :
-INSERT INTO user (login, password, role)
-VALUES ('admin', 'admin', 'admin');
 INSERT INTO utilisateurs (id_user, identifiant, mot_de_passe, role)
 VALUES ('ADM000001',
         'admin',
