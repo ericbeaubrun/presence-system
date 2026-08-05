@@ -1,6 +1,6 @@
 # Attendance Management and Verification System
 
-## Overview
+📖 **[API Documentation](https://ericbeaubrun.github.io/presence-system/)** — hosted on GitHub Pages, sources in [`docs/`](docs/).
 
 ## Overview
 
@@ -87,7 +87,21 @@ Responsibilities:
 * `spring-boot-starter-flyway`
 * `flyway-database-postgresql`
 * `spring-boot-starter-validation`
+* `springdoc-openapi-starter-webmvc-ui`
 * `lombok`
+
+### API Documentation
+
+The OpenAPI specification is derived from the controller annotations by `springdoc`. With the
+application running:
+
+* Specification: **http://localhost:8080/v3/api-docs.yaml**
+* Swagger UI: **http://localhost:8080/swagger-ui.html**
+
+The published site in [`docs/`](docs/) is served by GitHub Pages. Its `openapi.yaml` is
+regenerated and committed automatically by
+[`.github/workflows/api-docs.yml`](.github/workflows/api-docs.yml) on every push touching the
+backend — do not edit it by hand.
 
 ---
 

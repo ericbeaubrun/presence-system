@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presence System — API Documentation</title>
+<meta name="description" content="REST API documentation for the NFC-based Attendance Management and Verification System.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f6f7f9;
+    --fg: #1b1f24;
+    --fg-muted: #5b6472;
+    --border: #e2e5ea;
+    --accent: #2f6feb;
+    --accent-soft: #eaf0fe;
+    --code-bg: #f2f4f7;
+    --get: #1a7f5a;
+    --post: #2f6feb;
+    --put: #b06400;
+    --delete: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216;
+      --bg-soft: #161a20;
+      --fg: #e6e9ee;
+      --fg-muted: #99a2b0;
+      --border: #262c35;
+      --accent: #6d9bff;
+      --accent-soft: #17243d;
+      --code-bg: #1a1f27;
+      --get: #4ec99a;
+      --post: #6d9bff;
+      --put: #e0a24a;
+      --delete: #ef7a6d;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px 96px; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-soft);
+    padding: 64px 0 48px;
+    margin-bottom: 48px;
+  }
+  header .wrap { padding-bottom: 0; }
+  .eyebrow {
+    font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--fg-muted); margin: 0 0 12px;
+  }
+  h1 { font-size: 40px; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.02em; }
+  header p { color: var(--fg-muted); max-width: 62ch; margin: 0 0 28px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border-radius: 8px;
+    text-decoration: none; font-size: 15px; font-weight: 500;
+    border: 1px solid var(--border); color: var(--fg); background: var(--bg);
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: .9; color: #fff; }
+
+  h2 {
+    font-size: 24px; letter-spacing: -0.01em;
+    margin: 56px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 17px; margin: 32px 0 8px; }
+  p { margin: 0 0 16px; }
+  a { color: var(--accent); }
+
+  code, pre {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.55; margin: 0 0 16px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--fg-muted); font-weight: 600; }
+  td code { white-space: nowrap; }
+
+  .verb {
+    display: inline-block; font-family: ui-monospace, monospace; font-size: 12px;
+    font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 4px;
+    background: var(--code-bg);
+  }
+  .verb.get { color: var(--get); }
+  .verb.post { color: var(--post); }
+  .verb.put { color: var(--put); }
+  .verb.delete { color: var(--delete); }
+
+  .note {
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 0 0 16px;
+  }
+  .note p:last-child { margin-bottom: 0; }
+
+  footer {
+    border-top: 1px solid var(--border); margin-top: 72px; padding-top: 24px;
+    color: var(--fg-muted); font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 44px 0 36px; }
+    h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Documentation</p>
+    <h1>Presence System API</h1>
+    <p>
+      REST API of the NFC-based Attendance Management and Verification System —
+      a Spring Boot backend that turns badge scans on an ACR122U reader into verified
+      attendance records, and lets administrators correct them from a web dashboard.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href="reference.html">Full API reference</a>
+      <a class="btn" href="openapi.yaml">OpenAPI spec</a>
+      <a class="btn" href="https://github.com/ericbeaubrun/presence-system">Source on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2>Overview</h2>
+  <p>
+    The API is split in two families. The public one is called by the hardware client;
+    the protected one backs the administration dashboard.
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="verb post">POST</span></td>
+          <td><code>/api/v1/attendances</code></td>
+          <td>None</td>
+          <td>Register an attendance from a card scan</td>
+        </tr>
+        <tr>
+          <td><span class="verb get">GET</span></td>
+          <td><code>/api/admin/me</code></td>
+          <td>ADMIN</td>
+          <td>Validate credentials, return the caller</td>
+        </tr>
+        <tr>
+          <td><span class="verb get">GET</span></td>
+          <td><code>/api/admin/attendances</code></td>
+          <td>ADMIN</td>
+          <td>List every attendance record</td>
+        </tr>
+        <tr>
+          <td><span class="verb post">POST</span></td>
+          <td><code>/api/admin/attendances</code></td>
+          <td>ADMIN</td>
+          <td>Create a record manually</td>
+        </tr>
+        <tr>
+          <td><span class="verb put">PUT</span></td>
+          <td><code>/api/admin/attendances</code></td>
+          <td>ADMIN</td>
+          <td>Update an existing record</td>
+        </tr>
+        <tr>
+          <td><span class="verb delete">DELETE</span></td>
+          <td><code>/api/admin/attendances</code></td>
+          <td>ADMIN</td>
+          <td>Delete a record</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Base URL</h2>
+  <p>Running the stack locally with Docker Compose, the backend listens on:</p>
+  <pre><code>http://localhost:8080</code></pre>
+
+  <h2>Authentication</h2>
+  <p>
+    Every route under <code>/api/admin/**</code> requires HTTP Basic authentication with a
+    user holding the <code>ADMIN</code> role. Passwords are stored BCrypt-hashed and verified
+    against the <code>users</code> table.
+  </p>
+  <pre><code>curl -u admin:password http://localhost:8080/api/admin/me</code></pre>
+  <p>
+    <code>POST /api/v1/attendances</code> is deliberately left open so the NFC terminal can
+    post without carrying credentials. CSRF protection is disabled, and CORS accepts only
+    <code>http://localhost:*</code> and <code>http://127.0.0.1:*</code> origins, with credentials allowed.
+  </p>
+
+  <h2>Registering an attendance</h2>
+  <p>
+    The reader sends the card UID and its own identifier. The server resolves the student
+    from the card, derives the room from the reader id (the <code>L</code> prefix becomes
+    <code>S</code>), finds the course running in that room at that instant, and stores a
+    <code>present</code> record stamped with the current time.
+  </p>
+
+  <pre><code>curl -X POST http://localhost:8080/api/v1/attendances \
+  -H "Content-Type: application/json" \
+  -d '{"readerId": "L1101", "cardId": "04A3B2C1"}'</code></pre>
+
+  <p>A successful call returns <code>200 OK</code> with a plain-text confirmation. The call is rejected with <code>400 Bad Request</code> in three cases:</p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Scenario</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Valid check-in</td><td><code>200 OK</code></td></tr>
+        <tr><td>Unknown card UID</td><td><code>400 Bad Request</code></td></tr>
+        <tr><td>No course scheduled in the room right now</td><td><code>400 Bad Request</code></td></tr>
+        <tr><td>Student already checked in for that course</td><td><code>400 Bad Request</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <p>
+      <code>readerId</code> must be exactly 5 characters and <code>cardId</code> exactly 8 —
+      both are enforced by Jakarta Validation before the request reaches the service.
+    </p>
+  </div>
+
+  <h2>Managing records as an administrator</h2>
+  <p>
+    Records are addressed by the <code>studentId</code> + <code>courseId</code> pair rather than
+    a surrogate id. <code>POST</code> and <code>PUT</code> carry that pair in the body;
+    <code>DELETE</code> passes it as query parameters.
+  </p>
+
+  <h3>List</h3>
+  <pre><code>curl -u admin:password http://localhost:8080/api/admin/attendances</code></pre>
+
+  <h3>Create</h3>
+  <pre><code>curl -u admin:password -X POST http://localhost:8080/api/admin/attendances \
+  -H "Content-Type: application/json" \
+  -d '{
+        "studentId": "E001",
+        "courseId": "C001",
+        "status": "absent justifie",
+        "arrivalTime": null,
+        "justification": "Certificat médical"
+      }'</code></pre>
+
+  <h3>Update</h3>
+  <pre><code>curl -u admin:password -X PUT http://localhost:8080/api/admin/attendances \
+  -H "Content-Type: application/json" \
+  -d '{
+        "studentId": "E001",
+        "courseId": "C001",
+        "status": "present",
+        "arrivalTime": "08:15:00",
+        "justification": null
+      }'</code></pre>
+
+  <h3>Delete</h3>
+  <pre><code>curl -u admin:password -X DELETE \
+  "http://localhost:8080/api/admin/attendances?studentId=E001&amp;courseId=C001"</code></pre>
+
+  <div class="note">
+    <p>
+      <code>status</code> accepts only <code>present</code> or <code>absent justifie</code>.
+      Anything else fails validation with <code>400 Bad Request</code>.
+    </p>
+  </div>
+
+  <h2>Data model</h2>
+  <p>
+    <code>AttendanceDto</code> is what the admin endpoints return — a record joined with the
+    student, course and room it belongs to.
+  </p>
+
+  <pre><code>{
+  "studentId":       "E001",
+  "studentFullName": "Eric Beaubrun",
+  "courseId":        "C001",
+  "courseDate":      "2026-08-05",
+  "courseStartTime": "08:00:00",
+  "courseEndTime":   "10:00:00",
+  "roomId":          "S1101",
+  "status":          "present",
+  "arrivalTime":     "08:15:00",
+  "justification":   null
+}</code></pre>
+
+  <p>
+    Field-by-field constraints, request schemas and every response code live in the
+    <a href="reference.html">full reference</a>, generated from
+    <a href="openapi.yaml">openapi.yaml</a>.
+  </p>
+
+  <h2>How this documentation is built</h2>
+  <p>
+    <a href="openapi.yaml">openapi.yaml</a> is not written by hand. A GitHub Actions workflow
+    boots the application against a throwaway PostgreSQL, exports the specification that
+    <code>springdoc</code> derives from the controllers, and commits it back to
+    <code>docs/</code> — so the reference cannot drift from the code.
+  </p>
+  <p>
+    To change what appears here, edit the <code>@Operation</code>, <code>@ApiResponse</code>
+    and <code>@Schema</code> annotations in
+    <code>src/main/java/&hellip;/infrastructure/web/</code>.
+    When the application is running, the same specification is served live at
+    <code>/v3/api-docs.yaml</code>, with an interactive Swagger UI at
+    <code>/swagger-ui.html</code>.
+  </p>
+
+  <footer>
+    Presence System — CY Cergy Paris Université ·
+    <a href="https://github.com/ericbeaubrun/presence-system">github.com/ericbeaubrun/presence-system</a>
+  </footer>
+
+</div>
+
+</body>
+</html>
