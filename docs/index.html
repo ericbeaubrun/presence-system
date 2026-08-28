@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Presence System — API Documentation</title>
-<meta name="description" content="REST API documentation for the NFC-based Attendance Management and Verification System.">
+<title>Presence System — Documentation de l’API</title>
+<meta name="description" content="Documentation de l’API REST du système de gestion et de vérification des présences par NFC.">
 <style>
   :root {
     --bg: #ffffff;
@@ -127,135 +127,138 @@
 <header>
   <div class="wrap">
     <p class="eyebrow">Documentation</p>
-    <h1>Presence System API</h1>
+    <h1>API Presence System</h1>
     <p>
-      REST API of the NFC-based Attendance Management and Verification System —
-      a Spring Boot backend that turns badge scans on an ACR122U reader into verified
-      attendance records, and lets administrators correct them from a web dashboard.
+      API REST du système de gestion et de vérification des présences par NFC —
+      un backend Spring Boot qui transforme les badgeages effectués sur un lecteur ACR122U en
+      enregistrements de présence vérifiés, et permet aux administrateurs de les corriger
+      depuis un tableau de bord web.
     </p>
     <div class="actions">
-      <a class="btn btn-primary" href="reference.html">Full API reference</a>
-      <a class="btn" href="openapi.yaml">OpenAPI spec</a>
-      <a class="btn" href="https://github.com/ericbeaubrun/presence-system">Source on GitHub</a>
+      <a class="btn btn-primary" href="reference.html">Référence complète de l’API</a>
+      <a class="btn" href="openapi.yaml">Spécification OpenAPI</a>
+      <a class="btn" href="https://github.com/ericbeaubrun/presence-system">Code source sur GitHub</a>
     </div>
   </div>
 </header>
 
 <div class="wrap">
 
-  <h2>Overview</h2>
+  <h2>Vue d’ensemble</h2>
   <p>
-    The API is split in two families. The public one is called by the hardware client;
-    the protected one backs the administration dashboard.
+    L’API se divise en deux familles. La première, publique, est appelée par le client
+    matériel ; la seconde, protégée, alimente le tableau de bord d’administration.
   </p>
 
   <div class="table-scroll">
     <table>
       <thead>
-        <tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+        <tr><th>Méthode</th><th>Chemin</th><th>Auth</th><th>Rôle</th></tr>
       </thead>
       <tbody>
         <tr>
           <td><span class="verb post">POST</span></td>
           <td><code>/api/v1/attendances</code></td>
-          <td>None</td>
-          <td>Register an attendance from a card scan</td>
+          <td>Aucune</td>
+          <td>Enregistrer une présence à partir d’un badgeage</td>
         </tr>
         <tr>
           <td><span class="verb get">GET</span></td>
           <td><code>/api/admin/me</code></td>
           <td>ADMIN</td>
-          <td>Validate credentials, return the caller</td>
+          <td>Valider les identifiants et renvoyer l’appelant</td>
         </tr>
         <tr>
           <td><span class="verb get">GET</span></td>
           <td><code>/api/admin/attendances</code></td>
           <td>ADMIN</td>
-          <td>List every attendance record</td>
+          <td>Lister tous les enregistrements de présence</td>
         </tr>
         <tr>
           <td><span class="verb post">POST</span></td>
           <td><code>/api/admin/attendances</code></td>
           <td>ADMIN</td>
-          <td>Create a record manually</td>
+          <td>Créer un enregistrement manuellement</td>
         </tr>
         <tr>
           <td><span class="verb put">PUT</span></td>
           <td><code>/api/admin/attendances</code></td>
           <td>ADMIN</td>
-          <td>Update an existing record</td>
+          <td>Mettre à jour un enregistrement existant</td>
         </tr>
         <tr>
           <td><span class="verb delete">DELETE</span></td>
           <td><code>/api/admin/attendances</code></td>
           <td>ADMIN</td>
-          <td>Delete a record</td>
+          <td>Supprimer un enregistrement</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h2>Base URL</h2>
-  <p>Running the stack locally with Docker Compose, the backend listens on:</p>
+  <h2>URL de base</h2>
+  <p>Lorsque la stack est lancée en local avec Docker Compose, le backend écoute sur :</p>
   <pre><code>http://localhost:8080</code></pre>
 
-  <h2>Authentication</h2>
+  <h2>Authentification</h2>
   <p>
-    Every route under <code>/api/admin/**</code> requires HTTP Basic authentication with a
-    user holding the <code>ADMIN</code> role. Passwords are stored BCrypt-hashed and verified
-    against the <code>users</code> table.
+    Toutes les routes sous <code>/api/admin/**</code> exigent une authentification HTTP Basic
+    avec un utilisateur possédant le rôle <code>ADMIN</code>. Les mots de passe sont stockés
+    hachés avec BCrypt et vérifiés contre la table <code>users</code>.
   </p>
   <pre><code>curl -u admin:password http://localhost:8080/api/admin/me</code></pre>
   <p>
-    <code>POST /api/v1/attendances</code> is deliberately left open so the NFC terminal can
-    post without carrying credentials. CSRF protection is disabled, and CORS accepts only
-    <code>http://localhost:*</code> and <code>http://127.0.0.1:*</code> origins, with credentials allowed.
+    <code>POST /api/v1/attendances</code> est volontairement laissée ouverte afin que le terminal
+    NFC puisse envoyer ses requêtes sans transporter d’identifiants. La protection CSRF est
+    désactivée et le CORS n’accepte que les origines <code>http://localhost:*</code> et
+    <code>http://127.0.0.1:*</code>, avec les identifiants autorisés.
   </p>
 
-  <h2>Registering an attendance</h2>
+  <h2>Enregistrer une présence</h2>
   <p>
-    The reader sends the card UID and its own identifier. The server resolves the student
-    from the card, derives the room from the reader id (the <code>L</code> prefix becomes
-    <code>S</code>), finds the course running in that room at that instant, and stores a
-    <code>present</code> record stamped with the current time.
+    Le lecteur envoie l’UID de la carte ainsi que son propre identifiant. Le serveur retrouve
+    l’étudiant à partir de la carte, déduit la salle de l’identifiant du lecteur (le préfixe
+    <code>L</code> devient <code>S</code>), recherche le cours qui se déroule dans cette salle
+    à cet instant, puis enregistre une présence <code>present</code> horodatée à l’heure courante.
   </p>
 
   <pre><code>curl -X POST http://localhost:8080/api/v1/attendances \
   -H "Content-Type: application/json" \
   -d '{"readerId": "L1101", "cardId": "04A3B2C1"}'</code></pre>
 
-  <p>A successful call returns <code>200 OK</code> with a plain-text confirmation. The call is rejected with <code>400 Bad Request</code> in three cases:</p>
+  <p>Un appel réussi renvoie <code>200 OK</code> avec une confirmation en texte brut. L’appel est rejeté avec <code>400 Bad Request</code> dans trois cas :</p>
 
   <div class="table-scroll">
     <table>
-      <thead><tr><th>Scenario</th><th>Status</th></tr></thead>
+      <thead><tr><th>Scénario</th><th>Statut</th></tr></thead>
       <tbody>
-        <tr><td>Valid check-in</td><td><code>200 OK</code></td></tr>
-        <tr><td>Unknown card UID</td><td><code>400 Bad Request</code></td></tr>
-        <tr><td>No course scheduled in the room right now</td><td><code>400 Bad Request</code></td></tr>
-        <tr><td>Student already checked in for that course</td><td><code>400 Bad Request</code></td></tr>
+        <tr><td>Badgeage valide</td><td><code>200 OK</code></td></tr>
+        <tr><td>UID de carte inconnu</td><td><code>400 Bad Request</code></td></tr>
+        <tr><td>Aucun cours programmé dans la salle à cet instant</td><td><code>400 Bad Request</code></td></tr>
+        <tr><td>Étudiant déjà pointé pour ce cours</td><td><code>400 Bad Request</code></td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="note">
     <p>
-      <code>readerId</code> must be exactly 5 characters and <code>cardId</code> exactly 8 —
-      both are enforced by Jakarta Validation before the request reaches the service.
+      <code>readerId</code> doit comporter exactement 5 caractères et <code>cardId</code>
+      exactement 8 — ces deux contraintes sont appliquées par Jakarta Validation avant que la
+      requête n’atteigne le service.
     </p>
   </div>
 
-  <h2>Managing records as an administrator</h2>
+  <h2>Gérer les enregistrements en tant qu’administrateur</h2>
   <p>
-    Records are addressed by the <code>studentId</code> + <code>courseId</code> pair rather than
-    a surrogate id. <code>POST</code> and <code>PUT</code> carry that pair in the body;
-    <code>DELETE</code> passes it as query parameters.
+    Les enregistrements sont identifiés par le couple <code>studentId</code> + <code>courseId</code>
+    plutôt que par un identifiant technique. <code>POST</code> et <code>PUT</code> transmettent ce
+    couple dans le corps de la requête ; <code>DELETE</code> le passe en paramètres de requête.
   </p>
 
-  <h3>List</h3>
+  <h3>Lister</h3>
   <pre><code>curl -u admin:password http://localhost:8080/api/admin/attendances</code></pre>
 
-  <h3>Create</h3>
+  <h3>Créer</h3>
   <pre><code>curl -u admin:password -X POST http://localhost:8080/api/admin/attendances \
   -H "Content-Type: application/json" \
   -d '{
@@ -266,7 +269,7 @@
         "justification": "Certificat médical"
       }'</code></pre>
 
-  <h3>Update</h3>
+  <h3>Mettre à jour</h3>
   <pre><code>curl -u admin:password -X PUT http://localhost:8080/api/admin/attendances \
   -H "Content-Type: application/json" \
   -d '{
@@ -277,21 +280,21 @@
         "justification": null
       }'</code></pre>
 
-  <h3>Delete</h3>
+  <h3>Supprimer</h3>
   <pre><code>curl -u admin:password -X DELETE \
   "http://localhost:8080/api/admin/attendances?studentId=E001&amp;courseId=C001"</code></pre>
 
   <div class="note">
     <p>
-      <code>status</code> accepts only <code>present</code> or <code>absent justifie</code>.
-      Anything else fails validation with <code>400 Bad Request</code>.
+      <code>status</code> n’accepte que <code>present</code> ou <code>absent justifie</code>.
+      Toute autre valeur échoue à la validation avec un <code>400 Bad Request</code>.
     </p>
   </div>
 
-  <h2>Data model</h2>
+  <h2>Modèle de données</h2>
   <p>
-    <code>AttendanceDto</code> is what the admin endpoints return — a record joined with the
-    student, course and room it belongs to.
+    <code>AttendanceDto</code> est ce que renvoient les endpoints d’administration — un
+    enregistrement joint à l’étudiant, au cours et à la salle auxquels il se rattache.
   </p>
 
   <pre><code>{
@@ -308,24 +311,24 @@
 }</code></pre>
 
   <p>
-    Field-by-field constraints, request schemas and every response code live in the
-    <a href="reference.html">full reference</a>, generated from
+    Les contraintes champ par champ, les schémas de requête et l’ensemble des codes de réponse
+    figurent dans la <a href="reference.html">référence complète</a>, générée à partir de
     <a href="openapi.yaml">openapi.yaml</a>.
   </p>
 
-  <h2>How this documentation is built</h2>
+  <h2>Comment cette documentation est construite</h2>
   <p>
-    <a href="openapi.yaml">openapi.yaml</a> is not written by hand. A GitHub Actions workflow
-    boots the application against a throwaway PostgreSQL, exports the specification that
-    <code>springdoc</code> derives from the controllers, and commits it back to
-    <code>docs/</code> — so the reference cannot drift from the code.
+    <a href="openapi.yaml">openapi.yaml</a> n’est pas écrit à la main. Un workflow GitHub Actions
+    démarre l’application avec une base PostgreSQL jetable, exporte la spécification que
+    <code>springdoc</code> déduit des contrôleurs, puis la commite dans
+    <code>docs/</code> — la référence ne peut donc pas diverger du code.
   </p>
   <p>
-    To change what appears here, edit the <code>@Operation</code>, <code>@ApiResponse</code>
-    and <code>@Schema</code> annotations in
+    Pour modifier ce qui apparaît ici, éditez les annotations <code>@Operation</code>,
+    <code>@ApiResponse</code> et <code>@Schema</code> dans
     <code>src/main/java/&hellip;/infrastructure/web/</code>.
-    When the application is running, the same specification is served live at
-    <code>/v3/api-docs.yaml</code>, with an interactive Swagger UI at
+    Lorsque l’application tourne, la même spécification est servie en direct sur
+    <code>/v3/api-docs.yaml</code>, avec une interface Swagger interactive sur
     <code>/swagger-ui.html</code>.
   </p>
 
