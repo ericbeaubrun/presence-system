@@ -1,84 +1,84 @@
-# Attendance Management and Verification System
+# Système de gestion et de vérification des présences
 
-📖 **[API Documentation](https://ericbeaubrun.github.io/presence-system/)** — hosted on GitHub Pages, sources in [`docs/`](docs/).
+📖 **[Documentation de l'API](https://ericbeaubrun.github.io/presence-system/)** — hébergée sur GitHub Pages, sources dans [`docs/`](docs/).
 
-## Overview
+## Vue d'ensemble
 
-The Attendance Management and Verification System is a complete solution for managing student or employee attendance using NFC smart cards. This project was developed as part of the Database and Network course for the final year of the Computer Science Bachelor's degree at CY Cergy Paris Université. The system combines a secure Spring Boot backend, a web-based administration interface, and a lightweight Python client connected to an ACR122U NFC reader.
-
----
-
-## System Architecture
-
-The application consists of three main components:
-
-### 1. Backend Server
-
-Built with **Java 21** and **Spring Boot 4.1.0**, following a simplified **Hexagonal Architecture**.
-
-Its responsibilities include:
-
-* Processing attendance timestamps
-* Cross-checking room schedules
-* Preventing duplicate check-ins
-* Exposing secure REST APIs
-* Protecting administrative endpoints using **Spring Security** with **HTTP Basic Authentication**
-
-## Database Schema
-
-The database model is designed to efficiently manage the relationship between users, their assigned NFC cards, scheduled sessions, and attendance records.
-
-![Database Schema](https://github.com/user-attachments/assets/77ee136e-0f10-4b2b-a648-35ff21574795)
-
-Key entities include:
-* **Users**: Stores individual profile information.
-* **Cards**: Manages the mapping of unique NFC UIDs to specific users.
-* **Sessions**: Defines the schedule (time slots and locations) for attendance tracking.
-* **Attendances**: Records the actual check-in events, linking users, cards, and sessions to ensure verification and prevent duplicates.
-
-
-### 2. Web Administration Interface
-
-A web dashboard communicating asynchronously with the backend REST API.
-
-Features include:
-
-* Create attendance records
-* Read attendance history
-* Update records
-* Delete records
-* Manual attendance management for administrators
-
-### 3. Hardware Client
-
-A lightweight **Python** application running on a terminal connected to an **ACR122U NFC reader**.
-
-Responsibilities:
-
-* Read NFC card UIDs
-* Build JSON payloads
-* Send attendance events to the backend server
+Le système de gestion et de vérification des présences est une solution complète permettant de gérer la présence d'étudiants ou d'employés à l'aide de cartes à puce NFC. Ce projet a été développé dans le cadre du cours de Bases de données et Réseaux, en dernière année de Licence Informatique à CY Cergy Paris Université. Le système associe un backend Spring Boot sécurisé, une interface web d'administration et un client Python léger connecté à un lecteur NFC ACR122U.
 
 ---
 
-# Technical Stack
+## Architecture du système
+
+L'application se compose de trois éléments principaux :
+
+### 1. Serveur backend
+
+Développé en **Java 21** avec **Spring Boot 4.1.0**, suivant une **architecture hexagonale** simplifiée.
+
+Ses responsabilités sont les suivantes :
+
+* Traiter les horodatages de présence
+* Recouper les emplois du temps des salles
+* Empêcher les pointages en double
+* Exposer des API REST sécurisées
+* Protéger les endpoints d'administration avec **Spring Security** et l'**authentification HTTP Basic**
+
+## Schéma de la base de données
+
+Le modèle de données est conçu pour gérer efficacement les relations entre les utilisateurs, les cartes NFC qui leur sont attribuées, les séances planifiées et les enregistrements de présence.
+
+![Schéma de la base de données](https://github.com/user-attachments/assets/77ee136e-0f10-4b2b-a648-35ff21574795)
+
+Les entités principales sont :
+* **Users** : stocke les informations de profil de chaque personne.
+* **Cards** : gère la correspondance entre les UID NFC uniques et les utilisateurs.
+* **Sessions** : définit le planning (créneaux horaires et lieux) du suivi de présence.
+* **Attendances** : enregistre les pointages effectifs, en reliant utilisateurs, cartes et séances afin d'assurer la vérification et d'éviter les doublons.
+
+
+### 2. Interface web d'administration
+
+Un tableau de bord web qui communique de manière asynchrone avec l'API REST du backend.
+
+Fonctionnalités :
+
+* Créer des enregistrements de présence
+* Consulter l'historique des présences
+* Mettre à jour des enregistrements
+* Supprimer des enregistrements
+* Gestion manuelle des présences par les administrateurs
+
+### 3. Client matériel
+
+Une application **Python** légère qui s'exécute sur un terminal connecté à un **lecteur NFC ACR122U**.
+
+Responsabilités :
+
+* Lire les UID des cartes NFC
+* Construire les charges utiles JSON
+* Envoyer les événements de présence au serveur backend
+
+---
+
+# Stack technique
 
 ## Backend
 
-| Category              | Technology             |
-| --------------------- | ---------------------- |
-| Language              | Java 21                |
-| Framework             | Spring Boot 4.1.0      |
-| Architecture          | Hexagonal Architecture |
-| Security              | Spring Security        |
-| Database              | PostgreSQL             |
-| ORM                   | Spring Data JPA        |
-| Migration             | Flyway                 |
-| Validation            | Jakarta Validation     |
-| Boilerplate Reduction | Lombok                 |
-| Build Tool            | Gradle                 |
+| Catégorie                    | Technologie             |
+| ---------------------------- | ----------------------- |
+| Langage                      | Java 21                 |
+| Framework                    | Spring Boot 4.1.0       |
+| Architecture                 | Architecture hexagonale |
+| Sécurité                     | Spring Security         |
+| Base de données              | PostgreSQL              |
+| ORM                          | Spring Data JPA         |
+| Migration                    | Flyway                  |
+| Validation                   | Jakarta Validation      |
+| Réduction du code répétitif  | Lombok                  |
+| Outil de build               | Gradle                  |
 
-### Gradle Dependencies
+### Dépendances Gradle
 
 * `spring-boot-starter-webmvc`
 * `spring-boot-starter-security`
@@ -90,37 +90,37 @@ Responsibilities:
 * `springdoc-openapi-starter-webmvc-ui`
 * `lombok`
 
-### API Documentation
+### Documentation de l'API
 
-The OpenAPI specification is derived from the controller annotations by `springdoc`. With the
-application running:
+La spécification OpenAPI est dérivée des annotations des contrôleurs par `springdoc`. Lorsque
+l'application est en cours d'exécution :
 
-* Specification: **http://localhost:8080/v3/api-docs.yaml**
-* Swagger UI: **http://localhost:8080/swagger-ui.html**
+* Spécification : **http://localhost:8080/v3/api-docs.yaml**
+* Swagger UI : **http://localhost:8080/swagger-ui.html**
 
-The published site in [`docs/`](docs/) is served by GitHub Pages. Its `openapi.yaml` is
-regenerated and committed automatically by
-[`.github/workflows/api-docs.yml`](.github/workflows/api-docs.yml) on every push touching the
-backend — do not edit it by hand.
+Le site publié dans [`docs/`](docs/) est servi par GitHub Pages. Son fichier `openapi.yaml` est
+regénéré et commité automatiquement par
+[`.github/workflows/api-docs.yml`](.github/workflows/api-docs.yml) à chaque push touchant le
+backend — ne le modifiez pas à la main.
 
 ---
 
-## Hardware Client
+## Client matériel
 
-### Runtime
+### Environnement d'exécution
 
 * Python 3.x
 
-### Libraries
+### Bibliothèques
 
 * `pyscard`
 * `requests`
 
 ---
 
-# Testing Suite
+# Suite de tests
 
-All testing utilities are located inside:
+Tous les utilitaires de test se trouvent dans :
 
 ```text
 src/tests/
@@ -128,44 +128,44 @@ src/tests/
 
 ## admin_test.html
 
-Browser-based testing interface used to:
+Interface de test exécutée dans le navigateur, utilisée pour :
 
-* Verify CORS configuration
-* Test secured REST endpoints
-* Execute CRUD operations through the Fetch API
+* Vérifier la configuration CORS
+* Tester les endpoints REST sécurisés
+* Exécuter des opérations CRUD via l'API Fetch
 
 ---
 
 ## nfc_reader_client_test.py
 
-Hardware integration test that:
+Test d'intégration matérielle qui :
 
-* Reads NFC cards using the ACR122U reader
-* Retrieves the card UID
-* Sends the generated JSON payload to the backend server
+* Lit les cartes NFC à l'aide du lecteur ACR122U
+* Récupère l'UID de la carte
+* Envoie la charge utile JSON générée au serveur backend
 
 ---
 
 ## postman_test.json
 
-Postman collection used for API testing.
+Collection Postman utilisée pour tester l'API.
 
-Expected responses include:
+Réponses attendues :
 
-| Scenario           | Expected Status |
-| ------------------ | --------------- |
-| Valid check-in     | 200 OK          |
-| Duplicate check-in | 400 Bad Request |
-| Unknown badge      | 400 Bad Request |
-| Schedule mismatch  | 400 Bad Request |
+| Scénario                        | Statut attendu  |
+| ------------------------------- | --------------- |
+| Badgeage valide                 | 200 OK          |
+| Badgeage en double              | 400 Bad Request |
+| Badge inconnu                   | 400 Bad Request |
+| Aucun cours au planning         | 400 Bad Request |
 
 ---
 
 # Installation
 
-## 1. Build the Project
+## 1. Compiler le projet
 
-Generate the executable JAR:
+Générer le JAR exécutable :
 
 ```bash
 ./gradlew clean bootJar
@@ -173,30 +173,30 @@ Generate the executable JAR:
 
 ---
 
-## 2. Start Docker Services
+## 2. Démarrer les services Docker
 
-Build and launch the application stack:
+Construire et lancer la stack applicative :
 
 ```bash
 docker compose up -d --build
 ```
 
-Default services:
+Services par défaut :
 
-* Backend API: **http://localhost:8080**
-* PostgreSQL: **localhost:1234**
+* API backend : **http://localhost:8080**
+* PostgreSQL : **localhost:1234**
 
 ---
 
-## 3. Test the NFC Hardware Client
+## 3. Tester le client matériel NFC
 
-Install the required Python packages:
+Installer les paquets Python nécessaires :
 
 ```bash
 pip install requests pyscard
 ```
 
-Run the test script:
+Lancer le script de test :
 
 ```bash
 python src/tests/nfc_reader_client_test.py
@@ -204,15 +204,15 @@ python src/tests/nfc_reader_client_test.py
 
 ---
 
-## 4. Run the Web Administration Tests
+## 4. Exécuter les tests de l'interface d'administration
 
-Start a local HTTP server:
+Démarrer un serveur HTTP local :
 
 ```bash
 python -m http.server 3000
 ```
 
-Then open your browser and navigate to:
+Puis ouvrir le navigateur à l'adresse :
 
 ```
 http://localhost:3000/src/tests/admin_test.html
@@ -220,12 +220,11 @@ http://localhost:3000/src/tests/admin_test.html
 
 ---
 
-# Requirements
+# Prérequis
 
 * Java 21
 * Gradle
 * Docker & Docker Compose
 * Python 3.x
 * PostgreSQL
-* ACR122U NFC Reader
-
+* Lecteur NFC ACR122U
